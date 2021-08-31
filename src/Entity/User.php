@@ -2,14 +2,19 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ * @ApiResource(
+ *     normalizationContext={"groups"={"user:read"}},
+ *     denormalizationContext={"groups"={"user:write"}})
  * @UniqueEntity(fields={"email"}, message="Cet email a déjà été utilisé sur ce site.")
  */
 class User implements UserInterface
@@ -18,6 +23,7 @@ class User implements UserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups("user:read")
      */
     private int $id;
 
@@ -26,17 +32,20 @@ class User implements UserInterface
      * @Assert\NotBlank(message="Le champ Email est obligatoire")
      * @Assert\Email(message = "L'adresse '{{ value }}' n'est pas une adresse mail valide.")
      * @Assert\Length(max="100", maxMessage="L'adresse mail ne doit pas dépasser {{ limit }} caractères")
+     * @Groups({"user:read", "user:write"})
      */
     private string $email;
 
     /**
      * @ORM\Column(type="json")
+     * @Groups("user:read")
      */
     private array $roles = [];
 
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
+     * @Groups("user:write")
      */
     private string $password;
 
@@ -44,6 +53,7 @@ class User implements UserInterface
      * @ORM\Column(type="string")
      * @Assert\NotBlank(message="Le champ Prénom est obligatoire")
      * @Assert\Length(max=255, maxMessage="Le prénom ne doit pas dépasser {{ limit }} caractères")
+     * @Groups({"user:read", "user:write"})
      */
     private string $firstname;
 
@@ -51,6 +61,7 @@ class User implements UserInterface
      * @ORM\Column(type="string")
      * @Assert\NotBlank(message="Le champ Prénom est obligatoire")
      * @Assert\Length(max=255, maxMessage="Le prénom ne doit pas dépasser {{ limit }} caractères")
+     * @Groups({"user:read", "user:write"})
      */
     private string $lastname;
 
